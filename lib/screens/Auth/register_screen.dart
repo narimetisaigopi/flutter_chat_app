@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../home_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -64,5 +67,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String password = _passwordTextEditingController.text;
 
     print("  $email  >>>> $password");
+
+    FirebaseAuth.instance
+        .createUserWithEmailAndPassword(email: email, password: password)
+        .then((value) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("User account created")));
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (ctx) => HomeScreen()), (route) => false);
+    }).catchError((e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("User account creation failed " + e.toString())));
+    });
   }
 }

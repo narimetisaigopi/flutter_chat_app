@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_chat_app/screens/register_screen.dart';
+
+import '../home_screen.dart';
+import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -66,5 +69,17 @@ class _LoginScreenState extends State<LoginScreen> {
     String password = _passwordTextEditingController.text;
 
     print("  $email  >>>> $password");
+
+    FirebaseAuth.instance
+        .signInWithEmailAndPassword(email: email, password: password)
+        .then((value) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("User logged in")));
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (ctx) => HomeScreen()), (route) => false);
+    }).catchError((e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("User login failed " + e.toString())));
+    });
   }
 }
