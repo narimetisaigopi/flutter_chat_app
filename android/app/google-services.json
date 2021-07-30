@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "228799456608",
+    "project_id": "telugu-chatting-app-143",
+    "storage_bucket": "telugu-chatting-app-143.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:228799456608:android:c6d31f8c4b7ebd7a4c6a05",
+        "android_client_info": {
+          "package_name": "com.flutterchatapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "228799456608-5tq9b6g2p2gju11mb7thtgsbgiu0a2as.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.flutterchatapp",
+            "certificate_hash": "8dce83e114ea1040df1aee4eb4b079833630e9a9"
+          }
+        },
+        {
+          "client_id": "228799456608-b7ne2mbcvks3vr03l37tg2bq5mqglg2v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCL9U66A5oXdkNWr9zBoAhHV2JelwQrQYA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "228799456608-b7ne2mbcvks3vr03l37tg2bq5mqglg2v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
