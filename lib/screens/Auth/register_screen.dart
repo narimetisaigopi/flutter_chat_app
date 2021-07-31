@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_app/models/user_model.dart';
 
 import '../home_screen.dart';
 
@@ -66,18 +68,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String email = _emailTextEditingController.text;
     String password = _passwordTextEditingController.text;
 
-    print("  $email  >>>> $password");
+    //print("  $email  >>>> $password");
 
     FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password)
         .then((value) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("User account created")));
-      Navigator.pushAndRemoveUntil(context,
-          MaterialPageRoute(builder: (ctx) => HomeScreen()), (route) => false);
+      postDetailsToFirestore();
     }).catchError((e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("User account creation failed " + e.toString())));
     });
+  }
+
+  postDetailsToFirestore() async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    User user = FirebaseAuth.instance.currentUser;
+
+    UserModel userModel = UserModel();
+    userModel.uid = user.uid;
+    // narimetisaigopi@gmail.com
+    userModel.email = user.email;
+    userModel.name = user.email.split("@")[0];
+    await firebaseFirestore
+        .collection("users")
+        .doc(user.uid)
+        .set(userModel.toMap());
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("User account created")));
+    Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (ctx) => HomeScreen()), (route) => false);
   }
 }
