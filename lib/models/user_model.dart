@@ -16,7 +16,7 @@ class UserModel {
   });
 
   // data from server parsing
-  factory UserModel.fromMap(Map map) {
+  factory UserModel.fromMap(map) {
     return UserModel(
       uid: map['uid'],
       email: map['email'],
