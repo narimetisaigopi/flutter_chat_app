@@ -18,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   User user = FirebaseAuth.instance.currentUser;
 
-  UserModel userModel;
+  UserModel logginUserModel;
 
   getUserData() {
     FirebaseFirestore.instance
@@ -26,21 +26,24 @@ class _HomeScreenState extends State<HomeScreen> {
         .doc(user.uid)
         .get()
         .then((value) {
-      userModel = UserModel.fromMap(value.data());
+      this.logginUserModel = UserModel.fromMap(value.data());
+      setState(() {});
     });
   }
 
   @override
   initState() {
-    getUserData();
     super.initState();
+    getUserData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(userModel != null ? "Logged as ${userModel.name}" : "Home"),
+        title: Text(logginUserModel != null
+            ? "Logged as ${logginUserModel.name}"
+            : "Home"),
         actions: [
           IconButton(
               onPressed: () async {
@@ -63,77 +66,63 @@ class _HomeScreenState extends State<HomeScreen> {
           stream: FirebaseFirestore.instance
               .collection("rooms")
               .where("participantsList", arrayContains: user.uid)
-              .orderBy("lastMessageTimeStamp", descending: true)
-              .get()
-              .asStream(),
+              .orderBy("timeStamp", descending: true)
+              .snapshots(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
-              return Text(snapshot.error.toString());
+              return Center(child: Text(snapshot.error.toString()));
             }
+
             if (snapshot.hasData) {
               if (snapshot.data.docs.length == 0) {
-                return Center(child: Text("No Rooms Found"));
+                return Center(child: Text("No rooms"));
               }
-
               return ListView.builder(
-                  itemCount: snapshot.data.docs.length,
-                  itemBuilder: (context, index) {
-                    RoomModel roomModel =
-                        RoomModel.fromMap(snapshot.data.docs[index].data());
-
-                    return StreamBuilder(
-                        stream: FirebaseFirestore.instance
-                            .collection("users")
-                            .doc(user.uid == roomModel.senderId
-                                ? roomModel.peerId
-                                : roomModel.senderId)
-                            .get()
-                            .asStream(),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Container(
-                              child: Text(""),
-                            );
-                          }
-                          if (snapshot.hasData) {
-                            UserModel userModel =
-                                UserModel.fromMap(snapshot.data);
-                            print("userModel " + userModel.toMap().toString());
-                            return InkWell(
+                itemCount: snapshot.data.docs.length,
+                itemBuilder: (context, index) {
+                  RoomModel roomModel =
+                      RoomModel.fromMap(snapshot.data.docs[index].data());
+                  return StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection("users")
+                          .doc(roomModel.senderId == user.uid
+                              ? roomModel.peerId
+                              : roomModel.senderId)
+                          .get()
+                          .asStream(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          UserModel userModel =
+                              UserModel.fromMap(snapshot.data);
+                          return Card(
+                            child: ListTile(
                               onTap: () {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (ctx) => ChattingScreen(
                                               roomModel: roomModel,
+                                              userModel: userModel,
                                             )));
                               },
-                              child: Card(
-                                  child: ListTile(
-                                      leading: CircleAvatar(
-                                        radius: 32,
-                                        backgroundImage: NetworkImage(
-                                            userModel.profileImage),
-                                      ),
-                                      title: Text(userModel.name),
-                                      subtitle: Text(roomModel.lastMessage),
-                                      trailing: Text(
-                                        roomModel.lastMessageTimeStamp != null
-                                            ? Utilities
-                                                .displayTimeAgoFromTimestamp(
-                                                    roomModel
-                                                        .lastMessageTimeStamp
-                                                        .toDate()
-                                                        .toString())
-                                            : "",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 12),
-                                      ))),
-                            );
-                          }
-                          return Container();
-                        });
-                  });
+                              leading: CircleAvatar(
+                                radius: 32,
+                                backgroundImage:
+                                    NetworkImage(userModel.profileImage),
+                              ),
+                              title: Text(userModel.name),
+                              subtitle: Text(roomModel.lastMessage ?? ""),
+                              trailing: Text(roomModel.timeStamp != null
+                                  ? Utilities.displayTimeAgoFromTimestamp(
+                                      roomModel.timeStamp.toDate().toString())
+                                  : ""),
+                            ),
+                          );
+                        }
+                        return Container();
+                      });
+                },
+              );
             }
 
             return Center(child: CircularProgressIndicator());

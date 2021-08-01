@@ -8,11 +8,11 @@ class RoomModel {
   String roomId;
   String senderId; // this ui
   String peerId; // manam yavariki aethy message pampisthuno valu
-  Timestamp timeStamp;
+  Timestamp timeStamp; // last message time stamp
   String lastMessage;
   List participantsList = [];
 
-  Timestamp lastMessageTimeStamp;
+  Timestamp groupCreatedAt;
 
   RoomModel(
       {this.roomId,
@@ -21,11 +21,11 @@ class RoomModel {
       this.timeStamp,
       this.lastMessage,
       this.participantsList,
-      this.lastMessageTimeStamp});
+      this.groupCreatedAt});
 
   factory RoomModel.fromMap(Map map) {
     return RoomModel(
-      lastMessageTimeStamp: map['lastMessageTimeStamp'],
+      groupCreatedAt: map['groupCreatedAt'],
       roomId: map['roomId'],
       senderId: map['senderId'],
       peerId: map['peerId'],
@@ -41,7 +41,7 @@ class RoomModel {
       'participantsList': participantsList,
       'lastMessage': "",
       'peerId': peerId,
-      'timeStamp': FieldValue.serverTimestamp(),
+      'groupCreatedAt': FieldValue.serverTimestamp(),
       'senderId': FirebaseAuth.instance.currentUser.uid
     };
   }

@@ -106,6 +106,7 @@ class ShowListOfUsers extends StatelessWidget {
           MaterialPageRoute(
               builder: (ctx) => ChattingScreen(
                     roomModel: roomModel,
+                    userModel: toChatUserModel,
                   )));
     }
   }
